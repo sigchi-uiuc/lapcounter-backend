@@ -1,5 +1,5 @@
 # lapcounter-backend
-For 10/28, make sure that you have a flask instance of Heroku running, everyone has been added to it, and all the code has also been pushed to this repository.
+For 10/28, make sure that you have a Heroku instance of Flask running, everyone has been added to it, and all the code has also been pushed to this repository.
 Hardcode the following routes to return the following information via json:
 
 /info/users
