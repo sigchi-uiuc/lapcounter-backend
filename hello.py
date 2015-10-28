@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, url_for
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
@@ -22,8 +22,3 @@ def user_data(name):
 @app.route('/session/info')
 def session_info():
 	return jsonify({ 'Average_Lap_Speed':100 ,'Fastest_Lap_Speed':20, 'Duration_Session':30, 'Start_Session':'2:20', 'End_Session':'1:10'})
-
-
-with app.test_request_context():
-	print url_for('index')
-	print url_for('user_data', name='John Doe')
