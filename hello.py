@@ -14,7 +14,7 @@ def user_info():
 
 #return all information of a specific user
 @app.route('/info/users/data')
-def user_data(name):
+def user_data():
 	return jsonify({ 'Name': 'James Lee', 'year': 2018, 'registered': 2015, 'Average_Lap_Completion_Time': 20, 
 		'Average_Speed': 10, 'Fastest_Lap_Time': 10, 'Total_Laps_Completed': 20, 'Total_Distance_Ran': 10, 'Total_time_spent_running':30 })
 
