@@ -3,12 +3,14 @@ from flask import Flask, jsonify, make_response, render_template
 
 app = Flask(__name__)
 
+
+# return 'SIGCHI-UIUC lapcounter backend'
 @app.route('/')
 def index():
-    # return 'SIGCHI-UIUC lapcounter backend'
     render_data = {'data' : "15"}
     resp = make_response(render_template("index.html", name = render_data))
     return resp
+
 #ran array of all users
 @app.route('/info/users')
 def user_info():
