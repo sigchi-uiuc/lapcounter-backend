@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -9,9 +9,7 @@ db = SQLAlchemy(app)
 # Set "homepage" to index.html
 @app.route('/')
 def index():
-    render_data = {'data' : "15"}
-    resp = make_response(render_template("index.html", name = render_data))
-    return resp
+    return render_template('index.html')
 
 #ran array of all users
 @app.route('/info/users')
@@ -29,13 +27,12 @@ def user_data():
 def session_info():
     return jsonify({ 'Average_Lap_Speed':100 ,'Fastest_Lap_Speed':20, 'Duration_Session':30, 'Start_Session':'2:20', 'End_Session':'1:10'})
 
-
 # Create our database model
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
-    registered = db.Column(db.String(20))
+    registered = db.Column(db.Date)
     avg_lap_completed_time = db.Column(db.Integer)
     avg_speed = db.Column(db.Integer)
     fastest_lap_time  = db.Column(db.Integer)
@@ -56,7 +53,7 @@ class User(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
-# Save user's information to database and send to success page
+# Save e-mail to database and send to success page
 @app.route('/upload', methods=['POST'])
 def upload():
     name = None
