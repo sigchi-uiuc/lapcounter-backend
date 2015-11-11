@@ -8,15 +8,30 @@ db = SQLAlchemy(app)
 
 # Create our database model
 class User(db.Model):
-    __tablename__ = "users"
+    __tablename__ = "Users"
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True)
+    name = db.Column(db.String(20), unique=True)
+    registered = db.Column(db.Date)
+    avg_lap_completed_time = db.Colum(db.Float)
+    avg_speed = db.Colum(db.Float)
+    fastest_lap_time  = db.Colum(db.Float)
+    total_laps_completed = db.Colum(db.Integer)
+    total_distance_ran = db.Colum(db.Float)
+    total_time_spent_running = db.Colum(db.Float)
 
-    def __init__(self, email):
-        self.email = email
+
+    def __init__(self, name, registered, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running):
+        self.name = name
+        self.registered = registered
+        self.avg_lap_completed_time = avg_lap_completed_time
+        self.avg_speed = avg_speed
+        self.fastest_lap_time = fastest_lap_time
+        self.total_laps_completed = total_laps_completed
+        self.total_distance_ran = total_distance_ran
+        self.total_time_spent_running = total_time_spent_running
 
     def __repr__(self):
-        return '<E-mail %r>' % self.email
+        return '<Name %r>' % self.name
 
 # Set "homepage" to index.html
 @app.route('/')
@@ -24,14 +39,29 @@ def index():
     return render_template('index.html')
 
 # Save e-mail to database and send to success page
-@app.route('/prereg', methods=['POST'])
-def prereg():
-    email = None
+@app.route('/upload', methods=['POST'])
+def upload():
+    name = None
+    registered = None
+    avg_lap_completed_time = None
+    avg_speed = None
+    fastest_lap_time  = None
+    total_laps_completed = None
+    total_distance_ran = None
+    total_time_spent_running = None
+
     if request.method == 'POST':
-        email = request.form['email']
-        # Check that email does not already exist (not a great query, but works)
-        if not db.session.query(User).filter(User.email == email).count():
-            reg = User(email)
+        name = request.form['name']
+        registered = request.form['name']
+        alct = request.form['alct']
+        avg_speed = request.form['avg_speed']
+        fastest_lap_time = request.form['fastest_lap_time']
+        tlc = request.form['tlc']
+        tdr = request.form['tdr']
+        ttsr = request.form['ttsr']
+        # Check that name does not already exist (not a great query, but works)
+        if not db.session.query(User).filter(User.name == name).count():
+            reg = User(name)
             db.session.add(reg)
             db.session.commit()
             return render_template('success.html')
