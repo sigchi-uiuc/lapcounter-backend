@@ -61,7 +61,7 @@ def upload():
         ttsr = request.form['ttsr']
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            reg = User(name)
+            reg = User(name, registered, alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr)
             db.session.add(reg)
             db.session.commit()
             return render_template('success.html')
