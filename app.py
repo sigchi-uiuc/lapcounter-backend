@@ -2,7 +2,8 @@ from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/pre-registration'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/pre-registration'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://igsusmnkuuuiff:aJMRa9Tw81so2ncyhLvDED6prS@ec2-107-21-222-62.compute-1.amazonaws.com:5432/dflphcsocv57hu'
 db = SQLAlchemy(app)
 
 # Create our database model
