@@ -27,12 +27,29 @@ def user_data():
 def session_info():
     return jsonify({ 'Average_Lap_Speed':100 ,'Fastest_Lap_Speed':20, 'Duration_Session':30, 'Start_Session':'2:20', 'End_Session':'1:10'})
 
-# Create our database model
+# Create table of users on database 
 class User(db.Model):
-    __tablename__ = "users"
+    __tablename__ = "users_table"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
-    registered = db.Column(db.Date)
+    registered = db.Column(db.String(20))
+    data_id = db.Column(db.Integer, db.ForeignKey('data_table.id'))
+    # define relationship
+    data = db.relationship('Data', uselist=False, backref="users_table")
+
+
+    def __init__(self, name, registered, data):
+        self.name = name
+        self.registered = registered
+        self.data = data
+
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+#Create table of user's data on database
+class Data(db.Model):
+    __tablename__ = "data_table"
+    id = db.Column(db.Integer, primary_key=True)
     avg_lap_completed_time = db.Column(db.Integer)
     avg_speed = db.Column(db.Integer)
     fastest_lap_time  = db.Column(db.Integer)
@@ -40,9 +57,7 @@ class User(db.Model):
     total_distance_ran = db.Column(db.Integer)
     total_time_spent_running = db.Column(db.Integer)
 
-    def __init__(self, name, registered, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running):
-        self.name = name
-        self.registered = registered
+    def __init__(self, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running):
         self.avg_lap_completed_time = avg_lap_completed_time
         self.avg_speed = avg_speed
         self.fastest_lap_time = fastest_lap_time
@@ -51,7 +66,7 @@ class User(db.Model):
         self.total_time_spent_running = total_time_spent_running
 
     def __repr__(self):
-        return '<Name %r>' % self.name
+        return '<id %r>' % self.id
 
 # Save e-mail to database and send to success page
 @app.route('/upload', methods=['POST'])
@@ -74,10 +89,12 @@ def upload():
         tlc = request.form['tlc']
         tdr = request.form['tdr']
         ttsr = request.form['ttsr']
+
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            reg = User(name, registered, alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr)
-            db.session.add(reg)
+            reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr)
+            reg_user = User(name, registered, reg_data)
+            db.session.add(reg_user)
             db.session.commit()
             return render_template('success.html')
     return render_template('index.html')
