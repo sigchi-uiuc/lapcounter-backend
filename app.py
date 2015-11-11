@@ -51,7 +51,7 @@ class User(db.Model):
 
     @property
     def serialize(self):
-        return {'id' : self.id, 'name': self.name, 'registered': self.registered}
+        return { self.id : self.name}
 
 #Create table of user's data on database
 class Data(db.Model):
