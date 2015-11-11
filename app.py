@@ -12,12 +12,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
-    avg_lap_completed_time = db.Colum(db.Integer)
-    avg_speed = db.Colum(db.Integer)
-    fastest_lap_time  = db.Colum(db.Integer)
-    total_laps_completed = db.Colum(db.Integer)
-    total_distance_ran = db.Colum(db.Integer)
-    total_time_spent_running = db.Colum(db.Integer)
+    avg_lap_completed_time = db.Column(db.Integer)
+    avg_speed = db.Column(db.Integer)
+    fastest_lap_time  = db.Column(db.Integer)
+    total_laps_completed = db.Column(db.Integer)
+    total_distance_ran = db.Column(db.Integer)
+    total_time_spent_running = db.Column(db.Integer)
 
 
     def __init__(self, name, registered, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running):
