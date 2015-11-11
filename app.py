@@ -14,13 +14,16 @@ def index():
 #ran array of all users
 @app.route('/info/users')
 def user_info():
-    return jsonify({ '1': 'user1', '2':'user2', '3':'user3'})
+    #return jsonify({ '1': 'user1', '2':'user2', '3':'user3'})
+    return jsonify(json_list=[i.serialize for i in db.session.query(User).all()])
+
 
 #return all information of a specific user
-@app.route('/info/users/data')
-def user_data():
-    return jsonify({ 'Name': 'James Lee', 'year': 2018, 'registered': 2015, 'Average_Lap_Completion_Time': 20, 
-        'Average_Speed': 10, 'Fastest_Lap_Time': 10, 'Total_Laps_Completed': 20, 'Total_Distance_Ran': 10, 'Total_time_spent_running':30 })
+@app.route('/info/<input_users>/data')
+def user_data(input_users):
+    #return jsonify({ 'Name': 'James Lee', 'year': 2018, 'registered': 2015, 'Average_Lap_Completion_Time': 20, 'Average_Speed': 10, 'Fastest_Lap_Time': 10, 'Total_Laps_Completed': 20, 'Total_Distance_Ran': 10, 'Total_time_spent_running':30 })
+    result = db.session.query(User).filter(User.name == input_users).one()
+    return jsonify(result.data.serialize)
 
 #return all information of a specific running session
 @app.route('/session/info')
@@ -46,6 +49,10 @@ class User(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+    @property
+    def serialize(self):
+        return {'id' : self.id, 'name': self.name, 'registered': self.registered}
+
 #Create table of user's data on database
 class Data(db.Model):
     __tablename__ = "data_table"
@@ -67,6 +74,12 @@ class Data(db.Model):
 
     def __repr__(self):
         return '<id %r>' % self.id
+
+    @property
+    def serialize(self):
+        return {'avg_lap_completed_time' : self.avg_lap_completed_time, 'avg_speed': self.avg_speed, 
+        'fastest_lap_time': self.fastest_lap_time, 'total_laps_completed': self.total_laps_completed, 
+        'total_distance_ran': self.total_distance_ran, 'total_time_spent_running': self.total_time_spent_running}
 
 # Save e-mail to database and send to success page
 @app.route('/upload', methods=['POST'])
