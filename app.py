@@ -35,7 +35,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
-    registered = db.Column(db.Date)
+    registered = db.Column(db.String(20))
     avg_lap_completed_time = db.Column(db.Integer)
     avg_speed = db.Column(db.Integer)
     fastest_lap_time  = db.Column(db.Integer)
