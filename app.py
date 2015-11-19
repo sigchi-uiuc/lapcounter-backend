@@ -62,6 +62,8 @@ def upload():
             return render_template('success.html')
     return render_template('index.html')
 
+#@app.route('/upload')
+
 # Create table of users on database 
 class User(db.Model):
     __tablename__ = "users_table"
@@ -120,3 +122,20 @@ class Data(db.Model):
 if __name__ == '__main__':
     app.debug = True
     app.run()
+
+class Session(db.Model):
+    __tablename__ = "session_table"
+    session_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    num_laps = db.Column(db.Integer)
+    start_time = db.Column(db.Integer)
+    end_time = db.Column(db.Integer)
+
+    def __index__(self, user_id, num_laps, start_time, end_time):
+        self.user_id = user_id
+        self.num_laps = num_laps
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def __repr__(self):
+        return '<session_id %r>' % self.session_id
