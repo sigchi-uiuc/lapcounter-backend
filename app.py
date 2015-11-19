@@ -139,3 +139,18 @@ class Session(db.Model):
 
     def __repr__(self):
         return '<session_id %r>' % self.session_id
+
+class Lap(db.Model):
+    __tablename__ = "lap_table"
+    lap_id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer)
+    start_time = db.Column(db.Integer)
+    end_time = db.Column(db.Integer)
+
+    def __index__(self, session_id, start_time, end_time):
+        self.session_id = session_id
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def __repr__(self):
+        return '<lap_id %r>' % self.lap_id
