@@ -55,22 +55,22 @@ def upload():
 
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr)
             reg_user = User(name, registered, reg_data)
             db.session.add(reg_user)
             db.session.commit()
-            return render_template('success.html')
+        user=User.query.filter(User.name == name).get(user_id)
+        reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr)
+        user.data_table.append(reg_data)
     return render_template('index.html')
 
-# Create table of users on database 
+# Create table of users on database
 class User(db.Model):
     __tablename__ = "users_table"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
-    data_id = db.Column(db.Integer, db.ForeignKey('data_table.id'))
     # define relationship
-    data = db.relationship('Data', uselist=False, backref="users_table")
+    data = db.relationship('Data', backref="users_table", cascade="all, delete-orphan" , lazy='dynamic')
 
 
     def __init__(self, name, registered, data):
@@ -92,6 +92,7 @@ class User(db.Model):
 class Data(db.Model):
     __tablename__ = "data_table"
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
     avg_lap_completed_time = db.Column(db.Integer)
     avg_speed = db.Column(db.Integer)
     fastest_lap_time  = db.Column(db.Integer)
@@ -112,8 +113,8 @@ class Data(db.Model):
 
     @property
     def serialize(self):
-        return {'avg_lap_completed_time' : self.avg_lap_completed_time, 'avg_speed': self.avg_speed, 
-        'fastest_lap_time': self.fastest_lap_time, 'total_laps_completed': self.total_laps_completed, 
+        return {'avg_lap_completed_time' : self.avg_lap_completed_time, 'avg_speed': self.avg_speed,
+        'fastest_lap_time': self.fastest_lap_time, 'total_laps_completed': self.total_laps_completed,
         'total_distance_ran': self.total_distance_ran, 'total_time_spent_running': self.total_time_spent_running}
 
 
