@@ -45,23 +45,25 @@ def upload():
         end = request.form['end']
         duration = start - end
 
-        # Check that name does not already exist (not a great query, but works)
-        if not db.session.query(User).filter(User.name == name).count():
-            lap = Lap(start= start, end= end, duration=end)
-            user = User(name=name, registered=registered, laps=[lap])
-            db.session.add(user)
-            db.session.add(lap)
-            db.session.commit()
-            return render_template('success.html')
+        # # Check that name does not already exist (not a great query, but works)
+        # if not db.session.query(User).filter(User.name == name).count():
+        lap = Lap(start= start, end= end, duration=end)
+        user = User(name=name, registered=registered, laps=[lap])
+        print lap
+        print user
+        db.session.add(user)
+        db.session.add(lap)
+        db.session.commit()
+        return render_template('success.html')
     return render_template('index.html')
 
 # Create table of users on database
 class User(db.Model):
-    __tablename__ = "users"
+    # __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
-    laps = db.relationship("Lap", backref='users', lazy='dynamic')
+    laps = db.relationship("Lap", backref='user', lazy='dynamic')
 
     def __init__(self, name, registered):
         self.name = name
@@ -71,9 +73,9 @@ class User(db.Model):
         return '<Name %r>' % self.name
 
 class Lap(db.Model):
-    __tablename__ = "laps"
+    # __tablename__ = "laps"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     start = db.Column(db.Integer)
     end = db.Column(db.Integer)
     duration = db.Column(db.Integer)
