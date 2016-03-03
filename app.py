@@ -44,11 +44,11 @@ def upload():
         start = request.form['start']
         end = request.form['end']
         duration = start - end
-        lap = Lap(user_id, start, end, duration)
+        lap = Lap(start= start, end= end, duration=end)
 
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            user = User(name, registered)
+            user = User(name=name, registered=registered)
             user.laps.append(lap)
             db.session.add(user)
             db.session.add(lap)
@@ -75,13 +75,11 @@ class Lap(db.Model):
     __tablename__ = "laps"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User')
     start = db.Column(db.Integer)
     end = db.Column(db.Integer)
     duration = db.Column(db.Integer)
 
-    def __init__(self, user, start, end , duration):
-        self.user = user
+    def __init__(self, start, end , duration):
         self.start = start
         self.end = end
         self.duration = duration;
