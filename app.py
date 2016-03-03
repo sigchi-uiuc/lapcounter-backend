@@ -44,28 +44,25 @@ def upload():
         start = request.form['start']
         end = request.form['end']
         duration = start - end
+        lap = Lap(user_id, start, end, duration)
 
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
             user = User(name, registered)
+            user.laps.append(lap)
             db.session.add(user)
+            db.session.add(lap)
             db.session.commit()
-        user_id = db.session.query(User).filter(User.name == name).get(id);
-        lab = Lab(user_id, start, end, duration)
-        db.session.add(lab)
-        db.session.commit()
-        return render_template('success.html')
+            return render_template('success.html')
     return render_template('index.html')
 
 # Create table of users on database
 class User(db.Model):
-    __tablename__ = "user_table"
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
-    # define relationship
-    data = db.relationship('Lab', cascade="all, delete-orphan")
-
+    laps = db.relationship("Lap", backref='users', lazy='dynamic')
 
     def __init__(self, name, registered):
         self.name = name
@@ -74,33 +71,23 @@ class User(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
-    def as_dict(self):
-        obj_d = {
-            'id': self.id,
-            'name': self.name,
-        }
-        return obj_d
-
 class Lap(db.Model):
-    __tablename__ = "lap_table"
+    __tablename__ = "laps"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user_table.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User')
     start = db.Column(db.Integer)
     end = db.Column(db.Integer)
     duration = db.Column(db.Integer)
 
-    def __init__(self, user_id, start, end , duration):
-        self.user_id = user_id
+    def __init__(self, user, start, end , duration):
+        self.user = user
         self.start = start
         self.end = end
         self.duration = duration;
 
     def __repr__(self):
         return '<id %r>' % self.id
-
-    @property
-    def serialize(self):
-        return {}
 
 
 if __name__ == '__main__':
