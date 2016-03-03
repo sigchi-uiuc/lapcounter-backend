@@ -3,8 +3,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/lab_counter_db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True;
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://igsusmnkuuuiff:aJMRa9Tw81so2ncyhLvDED6prS@ec2-107-21-222-62.compute-1.amazonaws.com:5432/dflphcsocv57hu'
 db = SQLAlchemy(app)
 
@@ -32,6 +32,14 @@ def user_data(input_users):
 def session_info():
     return jsonify({ 'Average_Lap_Speed':100 ,'Fastest_Lap_Speed':20, 'Duration_Session':30, 'Start_Session':'2:20', 'End_Session':'1:10'})
 
+
+@app.route('/api',methods=['GET'])
+def api():
+    reg_user = User(request.args.get('name'), equest.args.get('registered'))
+    db.session.add(reg_user)
+    db.session.commit()
+    return render_template('success.html')
+
 # Save e-mail to database and send to success page
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -43,7 +51,6 @@ def upload():
     total_laps_completed = None
     total_distance_ran = None
     total_time_spent_running = None
-
     if request.method == 'POST':
         name = request.form['name']
         registered = request.form['registered']
@@ -53,15 +60,19 @@ def upload():
         tlc = request.form['tlc']
         tdr = request.form['tdr']
         ttsr = request.form['ttsr']
-
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            reg_user = User(name, registered, reg_data)
+            reg_user = User(name, registered)
+            reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr, reg_user)
             db.session.add(reg_user)
+            db.session.add(reg_data)
             db.session.commit()
-        user=User.query.filter(User.name == name).get(user_id)
-        reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr)
-        user.data_table.append(reg_data)
+            return render_template('success.html')
+        else:
+            reg_user = db.session.query(User).filter(User.name == name).one()
+            reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr, reg_user)
+            db.session.add(reg_data)
+            db.session.commit()
     return render_template('index.html')
 
 # Create table of users on database
@@ -70,14 +81,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
-    # define relationship
-    data = db.relationship('Data', backref="users_table", cascade="all, delete-orphan" , lazy='dynamic')
 
 
-    def __init__(self, name, registered, data):
+    def __init__(self, name, registered):
         self.name = name
         self.registered = registered
-        self.data = data
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -94,6 +102,8 @@ class Data(db.Model):
     __tablename__ = "data_table"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
+    user = db.relationship('User', uselist=False, backref="data_table")
+
     avg_lap_completed_time = db.Column(db.Integer)
     avg_speed = db.Column(db.Integer)
     fastest_lap_time  = db.Column(db.Integer)
@@ -101,13 +111,14 @@ class Data(db.Model):
     total_distance_ran = db.Column(db.Integer)
     total_time_spent_running = db.Column(db.Integer)
 
-    def __init__(self, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running):
+    def __init__(self, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running, user):
         self.avg_lap_completed_time = avg_lap_completed_time
         self.avg_speed = avg_speed
         self.fastest_lap_time = fastest_lap_time
         self.total_laps_completed = total_laps_completed
         self.total_distance_ran = total_distance_ran
         self.total_time_spent_running = total_time_spent_running
+        self.user = user;
 
     def __repr__(self):
         return '<id %r>' % self.id
@@ -121,4 +132,4 @@ class Data(db.Model):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(debug=True)
