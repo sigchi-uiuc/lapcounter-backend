@@ -45,48 +45,65 @@ def upload():
         end = request.form['end']
         duration = start - end
 
+        a = Address(email='foo@bar.com')
+        p = Person(name='foo')
+        p.addresses.append(a)
+        db.session.add(p)
+        db.session.add(a)
+        db.session.commit()
         # # Check that name does not already exist (not a great query, but works)
         # if not db.session.query(User).filter(User.name == name).count():
-        lap = Lap(start= start, end= end, duration=end)
-        user = User(name=name, registered=registered, laps=[lap])
-        print lap
-        print user
-        db.session.add(user)
-        db.session.add(lap)
-        db.session.commit()
+            # lap = Lap(start= start, end= end, duration=end)
+            # user = User(name=name, registered=registered, laps=[lap])
+            # print lap
+            # print user
+            # db.session.add(user)
+            # db.session.add(lap)
+            # db.session.commit()
         return render_template('success.html')
     return render_template('index.html')
 
+class Person(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    addresses = db.relationship('Address', backref='person',
+                                lazy='dynamic')
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(50))
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+
 # Create table of users on database
-class User(db.Model):
-    # __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), unique=True)
-    registered = db.Column(db.String(20))
-    laps = db.relationship("Lap", backref='user', lazy='dynamic')
-
-    def __init__(self, name, registered):
-        self.name = name
-        self.registered = registered
-
-    def __repr__(self):
-        return '<Name %r>' % self.name
-
-class Lap(db.Model):
-    # __tablename__ = "laps"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    start = db.Column(db.Integer)
-    end = db.Column(db.Integer)
-    duration = db.Column(db.Integer)
-
-    def __init__(self, start, end , duration):
-        self.start = start
-        self.end = end
-        self.duration = duration;
-
-    def __repr__(self):
-        return '<id %r>' % self.id
+# class User(db.Model):
+#     # __tablename__ = "users"
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(20), unique=True)
+#     registered = db.Column(db.String(20))
+#     laps = db.relationship("Lap", backref='user', lazy='dynamic')
+#
+#     def __init__(self, name, registered):
+#         self.name = name
+#         self.registered = registered
+#
+#     def __repr__(self):
+#         return '<Name %r>' % self.name
+#
+# class Lap(db.Model):
+#     # __tablename__ = "laps"
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+#     start = db.Column(db.Integer)
+#     end = db.Column(db.Integer)
+#     duration = db.Column(db.Integer)
+#
+#     def __init__(self, start, end , duration):
+#         self.start = start
+#         self.end = end
+#         self.duration = duration;
+#
+#     def __repr__(self):
+#         return '<id %r>' % self.id
 
 
 if __name__ == '__main__':
