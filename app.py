@@ -48,12 +48,12 @@ def upload():
 
 # Create table of users on database
 class User(db.Model):
-    # __tablename__ = "users_table"
+    __tablename__ = "user_table"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
     # define relationship
-    # data = db.relationship('Data', cascade="all, delete-orphan")
+    data = db.relationship('Data', cascade="all, delete-orphan")
 
 
     def __init__(self, name, registered):
@@ -70,34 +70,26 @@ class User(db.Model):
         }
         return obj_d
 
-#Create table of user's data on database
-# class Data(db.Model):
-#     __tablename__ = "data_table"
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-#     avg_lap_completed_time = db.Column(db.Integer)
-#     avg_speed = db.Column(db.Integer)
-#     fastest_lap_time  = db.Column(db.Integer)
-#     total_laps_completed = db.Column(db.Integer)
-#     total_distance_ran = db.Column(db.Integer)
-#     total_time_spent_running = db.Column(db.Integer)
-#
-#     def __init__(self, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running):
-#         self.avg_lap_completed_time = avg_lap_completed_time
-#         self.avg_speed = avg_speed
-#         self.fastest_lap_time = fastest_lap_time
-#         self.total_laps_completed = total_laps_completed
-#         self.total_distance_ran = total_distance_ran
-#         self.total_time_spent_running = total_time_spent_running
-#
-#     def __repr__(self):
-#         return '<id %r>' % self.id
-#
-#     @property
-#     def serialize(self):
-#         return {'avg_lap_completed_time' : self.avg_lap_completed_time, 'avg_speed': self.avg_speed,
-#         'fastest_lap_time': self.fastest_lap_time, 'total_laps_completed': self.total_laps_completed,
-#         'total_distance_ran': self.total_distance_ran, 'total_time_spent_running': self.total_time_spent_running}
+class Lap(db.Model):
+    __tablename__ = "lap_table"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    start = db.Column(db.Integer)
+    end = db.Column(db.Integer)
+    duration = db.Column(db.Integer)
+
+    def __init__(self, user_id, start, end , duration):
+        self.user_id = user_id
+        self.start = start
+        self.end = end
+        self.duration = end - start;
+
+    def __repr__(self):
+        return '<id %r>' % self.id
+
+    @property
+    def serialize(self):
+        return {}
 
 
 if __name__ == '__main__':
