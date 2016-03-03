@@ -24,8 +24,9 @@ def user_info():
 #return all information of a specific user
 @app.route('/info/<input_users>/data')
 def user_data(input_users):
-    result = db.session.query(User).filter(User.name == input_users).one()
-    return jsonify(result.data.serialize)
+    user = db.session.query(User).filter(User.name == input_users).one()
+    data= db.session.query(Data).filter(User.id == user.id);
+    return jsonify(data.serialize)
 
 #return all information of a specific running session
 @app.route('/session/info')
@@ -33,46 +34,54 @@ def session_info():
     return jsonify({ 'Average_Lap_Speed':100 ,'Fastest_Lap_Speed':20, 'Duration_Session':30, 'Start_Session':'2:20', 'End_Session':'1:10'})
 
 
-@app.route('/api',methods=['GET'])
-def api():
-    reg_user = User(request.args.get('name'), equest.args.get('registered'))
-    db.session.add(reg_user)
-    db.session.commit()
-    return render_template('success.html')
-
-# Save e-mail to database and send to success page
-@app.route('/upload', methods=['POST'])
-def upload():
-    name = None
-    registered = None
-    avg_lap_completed_time = None
-    avg_speed = None
-    fastest_lap_time  = None
-    total_laps_completed = None
-    total_distance_ran = None
-    total_time_spent_running = None
+@app.route('/api/<name>/<registered>/<start>/<end>',methods=['POST'])
+def api(name, registered, start, end):
     if request.method == 'POST':
-        name = request.form['name']
-        registered = request.form['registered']
-        alct = request.form['alct']
-        avg_speed = request.form['avg_speed']
-        fastest_lap_time = request.form['fastest_lap_time']
-        tlc = request.form['tlc']
-        tdr = request.form['tdr']
-        ttsr = request.form['ttsr']
+        duration = int(start)-int(end)
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            reg_user = User(name, registered)
-            reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr, reg_user)
+            reg_user = User(name,registered)
+            reg_data = Data(start, end, duration, reg_user)
             db.session.add(reg_user)
             db.session.add(reg_data)
             db.session.commit()
             return render_template('success.html')
         else:
             reg_user = db.session.query(User).filter(User.name == name).one()
-            reg_data = Data(alct, avg_speed, fastest_lap_time, tlc, tdr, ttsr, reg_user)
+            reg_data = Data(start, end, duration, reg_user)
             db.session.add(reg_data)
             db.session.commit()
+            return render_template('success.html')
+    return render_template('index.html')
+
+# Save e-mail to database and send to success page
+@app.route('/upload', methods=['POST'])
+def upload():
+    name = None
+    registered = None
+    start = None
+    end = None
+    duration = None
+    if request.method == 'POST':
+        name = request.form['name']
+        registered = request.form['registered']
+        start = int(request.form['start'])
+        end = int(request.form['end'])
+        duration = start-end
+        # Check that name does not already exist (not a great query, but works)
+        if not db.session.query(User).filter(User.name == name).count():
+            reg_user = User(name, registered)
+            reg_data = Data(start, end, duration, reg_user)
+            db.session.add(reg_user)
+            db.session.add(reg_data)
+            db.session.commit()
+            return render_template('success.html')
+        else:
+            reg_user = db.session.query(User).filter(User.name == name).one()
+            reg_data = Data(start, end, duration, reg_user)
+            db.session.add(reg_data)
+            db.session.commit()
+            return render_template('success.html')
     return render_template('index.html')
 
 # Create table of users on database
@@ -104,20 +113,14 @@ class Data(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
     user = db.relationship('User', uselist=False, backref="data_table")
 
-    avg_lap_completed_time = db.Column(db.Integer)
-    avg_speed = db.Column(db.Integer)
-    fastest_lap_time  = db.Column(db.Integer)
-    total_laps_completed = db.Column(db.Integer)
-    total_distance_ran = db.Column(db.Integer)
-    total_time_spent_running = db.Column(db.Integer)
+    start = db.Column(db.Integer)
+    end = db.Column(db.Integer)
+    duration  = db.Column(db.Integer)
 
-    def __init__(self, avg_lap_completed_time, avg_speed, fastest_lap_time, total_laps_completed, total_distance_ran, total_time_spent_running, user):
-        self.avg_lap_completed_time = avg_lap_completed_time
-        self.avg_speed = avg_speed
-        self.fastest_lap_time = fastest_lap_time
-        self.total_laps_completed = total_laps_completed
-        self.total_distance_ran = total_distance_ran
-        self.total_time_spent_running = total_time_spent_running
+    def __init__(self, start, end , duration, user):
+        self.start = start
+        self.end = end
+        self.duration = duration
         self.user = user;
 
     def __repr__(self):
@@ -125,9 +128,7 @@ class Data(db.Model):
 
     @property
     def serialize(self):
-        return {'avg_lap_completed_time' : self.avg_lap_completed_time, 'avg_speed': self.avg_speed,
-        'fastest_lap_time': self.fastest_lap_time, 'total_laps_completed': self.total_laps_completed,
-        'total_distance_ran': self.total_distance_ran, 'total_time_spent_running': self.total_time_spent_running}
+        return {'user_id':self.user_id, 'start':self.start, 'end':self.end, 'duration':self.duration}
 
 
 if __name__ == '__main__':
