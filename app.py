@@ -84,7 +84,7 @@ class User(db.Model):
 class Lap(db.Model):
     __tablename__ = "lap_table"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user_table.id'))
     start = db.Column(db.Integer)
     end = db.Column(db.Integer)
     duration = db.Column(db.Integer)
