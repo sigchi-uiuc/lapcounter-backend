@@ -35,15 +35,26 @@ def session_info():
 def upload():
     name = None
     registered = None
+    start = None
+    end = None
+    duration = None
     if request.method == 'POST':
         name = request.form['name']
         registered = request.form['registered']
+        start = request.form['start']
+        end = request.form['end']
+        duration = start - end
+
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
             user = User(name, registered)
             db.session.add(user)
             db.session.commit()
-            return render_template('success.html')
+        user_id = db.session.query(User).filter(User.name == name).get(id);
+        lab = Lab(user_id, start, end, duration)
+        db.session.add(lab)
+        db.session.commit()
+        return render_template('success.html')
     return render_template('index.html')
 
 # Create table of users on database
@@ -53,7 +64,7 @@ class User(db.Model):
     name = db.Column(db.String(20), unique=True)
     registered = db.Column(db.String(20))
     # define relationship
-    data = db.relationship('Data', cascade="all, delete-orphan")
+    data = db.relationship('Lab', cascade="all, delete-orphan")
 
 
     def __init__(self, name, registered):
@@ -73,7 +84,7 @@ class User(db.Model):
 class Lap(db.Model):
     __tablename__ = "lap_table"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     start = db.Column(db.Integer)
     end = db.Column(db.Integer)
     duration = db.Column(db.Integer)
@@ -82,7 +93,7 @@ class Lap(db.Model):
         self.user_id = user_id
         self.start = start
         self.end = end
-        self.duration = end - start;
+        self.duration = duration;
 
     def __repr__(self):
         return '<id %r>' % self.id
