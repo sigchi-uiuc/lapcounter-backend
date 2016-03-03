@@ -44,12 +44,11 @@ def upload():
         start = request.form['start']
         end = request.form['end']
         duration = start - end
-        lap = Lap(start= start, end= end, duration=end)
 
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
-            user = User(name=name, registered=registered)
-            user.laps.append(lap)
+            lap = Lap(start= start, end= end, duration=end)
+            user = User(name=name, registered=registered, laps=[lap])
             db.session.add(user)
             db.session.add(lap)
             db.session.commit()
