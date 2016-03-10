@@ -84,7 +84,6 @@ def upload():
             return render_template('success.html')
     return render_template('index.html')
 
-# Create table of users on database
 class User(db.Model):
     __tablename__ = "users_table"
     id = db.Column(db.Integer, primary_key=True)
