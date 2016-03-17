@@ -25,13 +25,14 @@ def user_info():
 @app.route('/info/<input_users>/data')
 def user_data(input_users):
     user = db.session.query(User).filter(User.name == input_users).one()
-    data= db.session.query(Data).filter(User.id == user.id);
-    return jsonify(data.serialize)
+    data= db.session.query(Data).filter(Data.user_id == user.id);
+    results = [ datam.as_dict() for datam in data ]
+    return jsonify({'results':results})
 
 @app.route('/info/data')
 def all_data():
     data = Data.query.all()
-    results = [ data.as_dict() for datam in data ]
+    results = [ datam.as_dict() for datam in data ]
     return jsonify({'results': results})
 
 #return all information of a specific running session
@@ -130,6 +131,15 @@ class Data(db.Model):
 
     def __repr__(self):
         return '<id %r>' % self.id
+
+    def as_dict(self):
+        obj_d = {
+            'user_id':self.user_id,
+            'start':self.start,
+            'end':self.end,
+            'duration':self.duration
+        }
+        return obj_d
 
     @property
     def serialize(self):
