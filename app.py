@@ -27,7 +27,7 @@ def user_data(input_users):
     user = db.session.query(User).filter(User.name == input_users).one()
     data= db.session.query(Data).filter(Data.user_id == user.id);
     results = [ datam.as_dict() for datam in data ]
-    return jsonify({'results':results})
+    return jsonify({'user':user.as_dict(), 'laps':results})
 
 @app.route('/info/data')
 def all_data():
