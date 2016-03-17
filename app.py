@@ -28,7 +28,7 @@ def user_data(input_users):
     data= db.session.query(Data).filter(User.id == user.id);
     return jsonify(data.serialize)
 
-@app.route('/info/dta'):
+@app.route('/info/data'):
 def all_data():
     data = Data.query.all()
     results = [ data.as_dict() for datam in data ]
