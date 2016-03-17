@@ -28,6 +28,12 @@ def user_data(input_users):
     data= db.session.query(Data).filter(User.id == user.id);
     return jsonify(data.serialize)
 
+@app.route('/info/dta'):
+def all_data():
+    data = Data.query.all()
+    results = [ data.as_dict() for datam in data ]
+    return jsonify({'results': results})
+
 #return all information of a specific running session
 @app.route('/session/info')
 def session_info():
