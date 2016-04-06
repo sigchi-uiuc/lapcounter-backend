@@ -27,7 +27,7 @@ Hardcode the following routes to return the following information via json:
     * /info/users
         * returns a list of users (names) with their ids
         * { "results": [ { "id": 1, "name": "username" } ] }
-    * /info/<input_users>/data
+    * /info/(input_users)/data
         * returns the user's name, a list of laps, and averages
         * {
             "info": {
@@ -61,6 +61,6 @@ Hardcode the following routes to return the following information via json:
            * { "results": [ { /* duration, end, start, user_id */ } ] }
 
 * Current path for displaying data
-    * /api/<name>/<registered>/<start>/<end>
+    * /api/(name)/(registered)/(start)/(end)
         * adds a lap that starts at <start> and ends at <end> to the user with <name>
         * if the user does not exists, creates a user with <name> and <registered>
