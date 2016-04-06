@@ -28,8 +28,15 @@ Hardcode the following routes to return the following information via json:
         * returns a list of users (names) with their ids
         * { "results": [ { "id": 1, "name": "username" } ] }
     * /info/<input_users>/data
-        * returns the user's name and a list of laps
+        * returns the user's name, a list of laps, and averages
         * {
+            "info": {
+                "average": 5.5,
+                "max_lap_time": 10,
+                "min_lap_time": 1,
+                "num_laps": 2,
+                "total_time": 11
+            }
             "laps": [
                 {
                   "duration": 10,

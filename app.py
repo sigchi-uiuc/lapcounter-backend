@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
-
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
@@ -25,9 +25,24 @@ def user_info():
 @app.route('/info/<input_users>/data')
 def user_data(input_users):
     user = db.session.query(User).filter(User.name == input_users).one()
-    data= db.session.query(Data).filter(Data.user_id == user.id);
+    data = db.session.query(Data).filter(Data.user_id == user.id)
     results = [ datam.as_dict() for datam in data ]
-    return jsonify({'user':user.as_dict(), 'laps':results})
+    total_time = 0
+    max_lap_time = 0
+    min_lap_time = sys.maxsize
+    for datam in results:
+        if datam['duration'] > max_lap_time:
+            max_lap_time = datam['duration']
+        if datam['duration'] < min_lap_time:
+            min_lap_time = datam['duration']
+        total_time = total_time + datam['duration']
+    info = {}
+    info['num_laps'] = len(results)
+    info['total_time'] = total_time
+    info['max_lap_time'] = max_lap_time
+    info['min_lap_time'] = min_lap_time
+    info['average'] = total_time / info['num_laps']
+    return jsonify({'user':user.as_dict(), 'laps':results, 'info':info})
 
 @app.route('/info/data')
 def all_data():
@@ -44,7 +59,7 @@ def session_info():
 @app.route('/api/<name>/<registered>/<start>/<end>',methods=['POST'])
 def api(name, registered, start, end):
     if request.method == 'POST':
-        duration = int(start)-int(end)
+        duration = int(end)-int(start)
         # Check that name does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.name == name).count():
             reg_user = User(name,registered)
