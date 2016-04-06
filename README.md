@@ -22,3 +22,33 @@ Hardcode the following routes to return the following information via json:
   * Fastest Lap Speed
   * Duration of Session
   * Start and End time of Session
+
+* Current paths for displaying data
+    * /info/users
+        * returns a list of users (names) with their ids
+        * { "results": [ { "id": 1, "name": "username" } ] }
+    * /info/<input_users>/data
+        * returns the user's name and a list of laps
+        * {
+            "laps": [
+                {
+                  "duration": 10,
+                  "end": 10,
+                  "start": 0,
+                  "user_id": 2
+                },
+                {
+                  "duration": 1,
+                  "end": 124,
+                  "start": 123,
+                  "user_id": 2
+                }
+              ],
+              "user": {
+                "id": 2,
+                "name": "username"
+              }
+            }
+    * /info/data
+        * returns a list of all laps
+           * { "results": [ { /* duration, end, start, user_id */ } ] }
