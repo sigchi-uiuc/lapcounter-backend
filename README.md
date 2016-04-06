@@ -62,5 +62,5 @@ Hardcode the following routes to return the following information via json:
 
 * Current path for displaying data
     * /api/(name)/(registered)/(start)/(end)
-        * adds a lap that starts at <start> and ends at <end> to the user with <name>
-        * if the user does not exists, creates a user with <name> and <registered>
+        * adds a lap that starts at start and ends at end to the user with name
+        * if the user does not exists, creates a user with name and registered
