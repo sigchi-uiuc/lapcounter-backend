@@ -60,7 +60,7 @@ Hardcode the following routes to return the following information via json:
         * returns a list of all laps
            * { "results": [ { /* duration, end, start, user_id */ } ] }
 
-* Current path for displaying data
-    * /api/(name)/(registered)/(start)/(end)
-        * adds a lap that starts at start and ends at end to the user with name
-        * if the user does not exists, creates a user with name and registered
+* Current path for uploading data
+    * /upload
+        * use POST method
+        * {"name" : _name_, "registered" : _registered_, "start" : _start_, "end" : _end_}
